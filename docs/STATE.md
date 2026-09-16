@@ -2,7 +2,8 @@
 
 ## Identidad de sesión
 
-- Encabezado oficial: `TELEGRAM 🤖 #[NÚMERO]`
+- Encabezado oficial obligatorio: `Ing. TELEGRAM 🤖 #[NÚMERO]`
+- Condición para usarlo: haber leído completas las reglas y completado la verificación inicial del repositorio/estado.
 - Sesión actual registrada: `#1`
 - Fecha de inicio del proyecto: 2026-09-15
 
@@ -41,11 +42,14 @@ Crear una aplicación Android mínima que permita:
 
 ## Reglas del proyecto
 
-Leer antes de modificar cualquier cosa:
+Leer antes de modificar cualquier cosa y antes de usar el encabezado oficial:
 
+- `docs/rules/00-identity-gate.md`
 - `docs/rules/01-core.md`
 - `docs/rules/02-git-quality-state.md`
 - `docs/rules/03-runtime-product-project.md`
+
+`docs/rules/00-identity-gate.md` tiene prioridad sobre formatos de encabezado anteriores.
 
 ## Siguiente paso real
 
