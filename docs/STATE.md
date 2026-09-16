@@ -14,9 +14,9 @@
 - Visibilidad: privada
 - Checkpoint 1: integrado en `main` mediante PR #1, commit `11ac8ff`.
 - Rama de trabajo: `feat/android-bootstrap`
-- Pull Request activo: #2 `feat(android): bootstrap share receiver app`
+- Pull Request activo: #2 `feat(android): bootstrap share receiver app`; abierto, mergeable, no fusionado.
 - Trabajo paralelo detectado: rama documental anterior de Checkpoint 1; su contenido ya fue integrado y no debe usarse para cambios nuevos.
-- CI: tres runs de Android CI han fallado antes de ejecutar steps. El más reciente, run `35065397108` sobre commit `f3d70a0`, terminó en failure; job `104694430559` reporta `steps: []` y no ofrece logs descargables. Esto confirma que el bloqueo persiste antes del checkout/build y no aporta evidencia de fallo de Gradle/código.
+- CI: cuatro runs de Android CI han fallado antes de ejecutar steps. El más reciente, run `35070353743` sobre commit `d19dbbe`, terminó en failure; job `104710178896` reporta `steps: []`, `runner_id: 0`, `runner_name: ""`. El check run contiene exactamente 1 anotación, pero el conector disponible no permite leer el endpoint de anotaciones. Esto confirma que el bloqueo persiste antes del checkout/build y no aporta evidencia de fallo de Gradle/código.
 - Código de aplicación: bootstrap Android/Kotlin existente en PR #2.
 - Versión estable: ninguna.
 - Versión en desarrollo: `0.1.0-dev`, bootstrap no validado todavía por CI ni dispositivo.
@@ -66,14 +66,16 @@ No incluye TDLib, login, destinos dinámicos, resolución `t.me/+...` ni envío 
 ### Evidencia CI actual
 
 - Run `35061184858`: failure antes de steps; job `104681649052` sin runner/steps.
-- Run `35065397108`: nuevo intento provocado por el commit documental `f3d70a0`; failure en ~4 segundos; job `104694430559` con `steps: []`; descarga de logs no disponible.
+- Run `35065397108`: failure antes de steps; job `104694430559` con `steps: []`; descarga de logs no disponible.
+- Run `35070353743`: failure en ~4 segundos sobre `d19dbbe`; job `104710178896` con `steps: []`, `runner_id: 0`, `runner_name: ""`, labels `["ubuntu-latest"]`.
+- Check run `104710178896`: `annotations_count: 1`; el endpoint concreto de anotaciones no es accesible mediante el conector actual, por lo que no se inventa su contenido.
 - El workflow declarado sigue usando `runs-on: ubuntu-latest` y steps estándar (`checkout`, Java 17, Android setup, Gradle 8.10.2, `:app:assembleDebug`). No existe un error de step que justifique cambiarlo todavía.
 
-La repetición confirma el síntoma pre-runner/pre-step. La causa exacta sigue sin poder determinarse desde el repositorio (posible configuración/disponibilidad/límite de Actions, no confirmada).
+La repetición confirma el síntoma pre-runner/pre-step. La causa exacta sigue sin poder determinarse desde las superficies accesibles. Posibles causas de cuenta/configuración/límites de Actions siguen siendo hipótesis, no hechos.
 
 ## KNOWN ISSUES
 
-- **CI no inicia steps (prioridad alta para Checkpoint 2):** al menos runs `35061184858` y `35065397108` terminan antes del checkout; el último job `104694430559` tiene `steps: []` y sin logs descargables. Causa exacta externa al código todavía desconocida. Impacto: no se puede declarar el bootstrap compilable ni producir APK verificable. Acción: revisar configuración/estado/límites de GitHub Actions desde la cuenta/repositorio cuando sea accesible; no alterar Gradle/código para intentar resolver un fallo que ocurre antes de ejecutarlos.
+- **CI no inicia steps (prioridad alta para Checkpoint 2):** cuatro runs terminan antes del checkout; el último job `104710178896` tiene `steps: []` y `runner_id: 0`. El check asociado sí registra una anotación, pero su texto no es accesible con el conector actual. Causa exacta desconocida. Impacto: no se puede declarar el bootstrap compilable ni producir APK verificable. Acción: revisar en GitHub la anotación visible del job/check y la configuración/estado/límites de Actions, o ejecutar `:app:assembleDebug` en un entorno Android local. No alterar Gradle/código para intentar resolver un fallo que ocurre antes de ejecutarlos.
 - La publicación dinámica de Sharing Shortcuts todavía no está implementada; solo existe la declaración de share-target necesaria para el bootstrap.
 - Integración exacta de TDLib/ABI/tamaño todavía no fue probada en Gradle.
 - El comportamiento de Sharing Shortcuts debe validarse en REDMAGIC; Android decide ranking/posición.
@@ -92,4 +94,4 @@ Leer antes de modificar cualquier cosa y antes de usar el encabezado oficial:
 
 ## Siguiente paso real
 
-Checkpoint 2 permanece bloqueado por infraestructura de CI. Revisar primero configuración/estado/límites de GitHub Actions del repositorio/cuenta cuando esa información sea accesible. No modificar Gradle ni el código del bootstrap hasta que un run obtenga runner y produzca un error de step concreto, o hasta disponer de un entorno Android local alternativo que pueda ejecutar `:app:assembleDebug`. Si el build llega a verde, registrar el APK debug como artefacto verificable y cerrar Checkpoint 2 antes de implementar publicación dinámica/persistencia de destinos. TDLib sigue fuera de alcance hasta tener el bootstrap verde.
+Checkpoint 2 permanece bloqueado por infraestructura de CI. Antes de cualquier cambio de código, leer la única anotación del check/job fallido desde la interfaz de GitHub o una API que permita ese endpoint, y revisar configuración/estado/límites de GitHub Actions del repositorio/cuenta. Alternativamente, disponer de un entorno Android local que pueda ejecutar `:app:assembleDebug`. Si el build llega a verde, registrar el APK debug como artefacto verificable y cerrar Checkpoint 2 antes de implementar publicación dinámica/persistencia de destinos. TDLib sigue fuera de alcance hasta tener el bootstrap verde.
