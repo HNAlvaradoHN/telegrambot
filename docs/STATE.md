@@ -12,13 +12,13 @@
 - Repositorio oficial: `HNAlvaradoHN/telegrambot`
 - Rama principal: `main`
 - Visibilidad: privada
-- Rama activa: `main`
-- Pull Request activo: ninguno
-- Ramas paralelas: ninguna verificada al inicio
+- Rama de trabajo: `docs/checkpoint-1-architecture`
+- Pull Request activo: pendiente de abrir para Checkpoint 1
+- Trabajo paralelo detectado antes de iniciar: ninguno
 - CI: todavía no configurado
 - Código de aplicación: todavía no existe
 - Versión estable: ninguna
-- Versión en desarrollo: bootstrap inicial, sin versión funcional
+- Versión en desarrollo: arquitectura validada documentalmente; sin versión funcional
 - Despliegue estable: ninguno
 - Despliegue experimental: ninguno
 
@@ -40,6 +40,30 @@ Crear una aplicación Android mínima que permita:
 - No declarar el envío directo como resuelto hasta validarlo en un dispositivo Android real.
 - Preferir integración oficial de Telegram y APIs oficiales de Android cuando sea viable.
 
+## Checkpoints
+
+### Checkpoint 1 — arquitectura mínima
+
+Estado: **validado documentalmente; pendiente de revisión/merge**.
+
+Decisión propuesta y documentada en `docs/architecture.md`:
+
+- Android nativo/Kotlin.
+- Sharing Shortcuts (`ShortcutManagerCompat`) para publicar destinos individuales en Sharesheet.
+- TDLib para autenticación y envío como cuenta de usuario.
+- `api_id`/`api_hash` propios suministrados fuera de Git.
+- Persistencia local mínima del destino (`id`, nombre, `chatId`, enlace opcional y estado).
+- No marcar un enlace como enviable si requiere aprobación o el usuario no puede escribir.
+
+Riesgos principales: credenciales API obligatorias, permisos de escritura del chat, complejidad/binarios nativos de TDLib, ranking OEM del Sharesheet y manejo de URI `content://`.
+
+## KNOWN ISSUES
+
+- No hay build Android todavía; por tanto no existe APK verificable.
+- Integración exacta de TDLib/ABI/tamaño todavía no fue probada en Gradle.
+- El comportamiento de Sharing Shortcuts debe validarse en REDMAGIC; Android decide ranking/posición.
+- No se dispone aún de credenciales Telegram API para una prueba real; nunca deben subirse al repositorio.
+
 ## Reglas del proyecto
 
 Leer antes de modificar cualquier cosa y antes de usar el encabezado oficial:
@@ -53,4 +77,4 @@ Leer antes de modificar cualquier cosa y antes de usar el encabezado oficial:
 
 ## Siguiente paso real
 
-Checkpoint 1: validar técnicamente la arquitectura mínima para autenticación de Telegram, resolución de enlaces privados `t.me/+...`, persistencia segura del destino y publicación como destino de compartir en Android; documentar riesgos antes de escribir la implementación.
+Checkpoint 2: después de integrar/revisar Checkpoint 1, crear un esqueleto Android mínimo en una rama `feat/*`, configurar build reproducible y CI sin secretos, declarar una actividad receptora + Sharing Shortcuts y demostrar que una APK base compila. Integrar TDLib solo después de tener ese build verde para aislar fallos.
