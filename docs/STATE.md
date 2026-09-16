@@ -16,7 +16,7 @@
 - Rama de trabajo: `feat/android-bootstrap`
 - Pull Request activo: #2 `feat(android): bootstrap share receiver app`
 - Trabajo paralelo detectado: rama documental anterior de Checkpoint 1; su contenido ya fue integrado y no debe usarse para cambios nuevos.
-- CI: Android CI run `35061184858` terminó en failure antes de ejecutar ningún step; job `104681649052` muestra `steps: []`, `runner_id: 0` y runner vacío. No hay evidencia de fallo de Gradle/código.
+- CI: tres runs de Android CI han fallado antes de ejecutar steps. El más reciente, run `35065397108` sobre commit `f3d70a0`, terminó en failure; job `104694430559` reporta `steps: []` y no ofrece logs descargables. Esto confirma que el bloqueo persiste antes del checkout/build y no aporta evidencia de fallo de Gradle/código.
 - Código de aplicación: bootstrap Android/Kotlin existente en PR #2.
 - Versión estable: ninguna.
 - Versión en desarrollo: `0.1.0-dev`, bootstrap no validado todavía por CI ni dispositivo.
@@ -65,11 +65,15 @@ No incluye TDLib, login, destinos dinámicos, resolución `t.me/+...` ni envío 
 
 ### Evidencia CI actual
 
-Run `35061184858` (PR #2) finalizó en aproximadamente dos segundos. Su único job `104681649052` no recibió runner (`runner_id: 0`, nombre vacío) y reporta cero steps ejecutados. Los logs del job no están disponibles. Por ello, el fallo ocurre antes del checkout/build y **no debe corregirse modificando Gradle o código sin nueva evidencia**.
+- Run `35061184858`: failure antes de steps; job `104681649052` sin runner/steps.
+- Run `35065397108`: nuevo intento provocado por el commit documental `f3d70a0`; failure en ~4 segundos; job `104694430559` con `steps: []`; descarga de logs no disponible.
+- El workflow declarado sigue usando `runs-on: ubuntu-latest` y steps estándar (`checkout`, Java 17, Android setup, Gradle 8.10.2, `:app:assembleDebug`). No existe un error de step que justifique cambiarlo todavía.
+
+La repetición confirma el síntoma pre-runner/pre-step. La causa exacta sigue sin poder determinarse desde el repositorio (posible configuración/disponibilidad/límite de Actions, no confirmada).
 
 ## KNOWN ISSUES
 
-- **CI runner no inicia (prioridad alta para Checkpoint 2):** run `35061184858`, job `104681649052`; `steps: []`, `runner_id: 0`. Causa exacta externa al workflow todavía desconocida (posible disponibilidad/configuración/límite de Actions, no confirmada). Impacto: no se puede declarar el bootstrap compilable ni producir APK verificable. Acción: revalidar un run posterior; si repite sin runner, revisar estado/configuración de GitHub Actions sin alterar código a ciegas.
+- **CI no inicia steps (prioridad alta para Checkpoint 2):** al menos runs `35061184858` y `35065397108` terminan antes del checkout; el último job `104694430559` tiene `steps: []` y sin logs descargables. Causa exacta externa al código todavía desconocida. Impacto: no se puede declarar el bootstrap compilable ni producir APK verificable. Acción: revisar configuración/estado/límites de GitHub Actions desde la cuenta/repositorio cuando sea accesible; no alterar Gradle/código para intentar resolver un fallo que ocurre antes de ejecutarlos.
 - La publicación dinámica de Sharing Shortcuts todavía no está implementada; solo existe la declaración de share-target necesaria para el bootstrap.
 - Integración exacta de TDLib/ABI/tamaño todavía no fue probada en Gradle.
 - El comportamiento de Sharing Shortcuts debe validarse en REDMAGIC; Android decide ranking/posición.
@@ -88,4 +92,4 @@ Leer antes de modificar cualquier cosa y antes de usar el encabezado oficial:
 
 ## Siguiente paso real
 
-Revalidar CI del PR #2. No modificar Gradle/código basándose en el failure actual porque el job no ejecutó ningún step. Si un run posterior obtiene runner y falla dentro de un step, leer ese error y corregir únicamente su causa. Si queda verde, registrar el APK debug como artefacto verificable y cerrar Checkpoint 2 antes de implementar publicación dinámica/persistencia de destinos. TDLib sigue fuera de alcance hasta tener el bootstrap verde.
+Checkpoint 2 permanece bloqueado por infraestructura de CI. Revisar primero configuración/estado/límites de GitHub Actions del repositorio/cuenta cuando esa información sea accesible. No modificar Gradle ni el código del bootstrap hasta que un run obtenga runner y produzca un error de step concreto, o hasta disponer de un entorno Android local alternativo que pueda ejecutar `:app:assembleDebug`. Si el build llega a verde, registrar el APK debug como artefacto verificable y cerrar Checkpoint 2 antes de implementar publicación dinámica/persistencia de destinos. TDLib sigue fuera de alcance hasta tener el bootstrap verde.
