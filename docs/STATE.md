@@ -12,15 +12,16 @@
 - Repositorio oficial: `HNAlvaradoHN/telegrambot`
 - Rama principal: `main`
 - Visibilidad: privada
-- Rama de trabajo: `docs/checkpoint-1-architecture`
-- Pull Request activo: pendiente de abrir para Checkpoint 1
-- Trabajo paralelo detectado antes de iniciar: ninguno
-- CI: todavía no configurado
-- Código de aplicación: todavía no existe
-- Versión estable: ninguna
-- Versión en desarrollo: arquitectura validada documentalmente; sin versión funcional
-- Despliegue estable: ninguno
-- Despliegue experimental: ninguno
+- Checkpoint 1: integrado en `main` mediante PR #1, commit `11ac8ff`.
+- Rama de trabajo: `feat/android-bootstrap`
+- Pull Request activo: #2 `feat(android): bootstrap share receiver app`
+- Trabajo paralelo detectado: rama documental anterior de Checkpoint 1; su contenido ya fue integrado y no debe usarse para cambios nuevos.
+- CI: workflow Android agregado en PR #2; primer run pendiente de aparecer/verificarse.
+- Código de aplicación: bootstrap Android/Kotlin existente en PR #2.
+- Versión estable: ninguna.
+- Versión en desarrollo: `0.1.0-dev`, bootstrap no validado todavía por CI ni dispositivo.
+- Despliegue estable: ninguno.
+- Despliegue experimental: ninguno.
 
 ## Objetivo actual
 
@@ -44,22 +45,28 @@ Crear una aplicación Android mínima que permita:
 
 ### Checkpoint 1 — arquitectura mínima
 
-Estado: **validado documentalmente; pendiente de revisión/merge**.
+Estado: **integrado en main**.
 
-Decisión propuesta y documentada en `docs/architecture.md`:
+Arquitectura documentada en `docs/architecture.md`: Android nativo/Kotlin + Sharing Shortcuts para destinos + TDLib para autenticación/envío como cuenta de usuario. Los secretos se suministrarán fuera de Git.
 
-- Android nativo/Kotlin.
-- Sharing Shortcuts (`ShortcutManagerCompat`) para publicar destinos individuales en Sharesheet.
-- TDLib para autenticación y envío como cuenta de usuario.
-- `api_id`/`api_hash` propios suministrados fuera de Git.
-- Persistencia local mínima del destino (`id`, nombre, `chatId`, enlace opcional y estado).
-- No marcar un enlace como enviable si requiere aprobación o el usuario no puede escribir.
+### Checkpoint 2 — bootstrap Android
 
-Riesgos principales: credenciales API obligatorias, permisos de escritura del chat, complejidad/binarios nativos de TDLib, ranking OEM del Sharesheet y manejo de URI `content://`.
+Estado: **implementado en PR #2; pendiente de CI**.
+
+Incluye:
+
+- proyecto Android/Kotlin mínimo;
+- `ShareReceiverActivity` para `ACTION_SEND` de texto, imagen, video y PDF;
+- declaración `share-target` en `res/xml/shortcuts.xml`;
+- GitHub Actions sin secretos para `:app:assembleDebug`;
+- publicación de `app-debug.apk` como artefacto si el build pasa.
+
+No incluye TDLib, login, destinos dinámicos, resolución `t.me/+...` ni envío Telegram. La actividad receptora muestra explícitamente que el transporte aún no está integrado.
 
 ## KNOWN ISSUES
 
-- No hay build Android todavía; por tanto no existe APK verificable.
+- PR #2 aún no tiene un resultado CI verificado; no existe APK declarada válida todavía.
+- La publicación dinámica de Sharing Shortcuts todavía no está implementada; solo existe la declaración de share-target necesaria para el bootstrap.
 - Integración exacta de TDLib/ABI/tamaño todavía no fue probada en Gradle.
 - El comportamiento de Sharing Shortcuts debe validarse en REDMAGIC; Android decide ranking/posición.
 - No se dispone aún de credenciales Telegram API para una prueba real; nunca deben subirse al repositorio.
@@ -77,4 +84,4 @@ Leer antes de modificar cualquier cosa y antes de usar el encabezado oficial:
 
 ## Siguiente paso real
 
-Checkpoint 2: después de integrar/revisar Checkpoint 1, crear un esqueleto Android mínimo en una rama `feat/*`, configurar build reproducible y CI sin secretos, declarar una actividad receptora + Sharing Shortcuts y demostrar que una APK base compila. Integrar TDLib solo después de tener ese build verde para aislar fallos.
+Leer el primer GitHub Actions run del PR #2. Si falla, identificar y corregir únicamente la causa real. Si queda verde, registrar el APK debug como artefacto verificable y cerrar Checkpoint 2 antes de implementar publicación dinámica/persistencia de destinos. TDLib sigue fuera de alcance hasta tener el bootstrap verde.
