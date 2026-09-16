@@ -16,7 +16,7 @@
 - Rama de trabajo: `feat/android-bootstrap`
 - Pull Request activo: #2 `feat(android): bootstrap share receiver app`
 - Trabajo paralelo detectado: rama documental anterior de Checkpoint 1; su contenido ya fue integrado y no debe usarse para cambios nuevos.
-- CI: workflow Android agregado en PR #2; primer run pendiente de aparecer/verificarse.
+- CI: Android CI run `35061184858` terminó en failure antes de ejecutar ningún step; job `104681649052` muestra `steps: []`, `runner_id: 0` y runner vacío. No hay evidencia de fallo de Gradle/código.
 - Código de aplicación: bootstrap Android/Kotlin existente en PR #2.
 - Versión estable: ninguna.
 - Versión en desarrollo: `0.1.0-dev`, bootstrap no validado todavía por CI ni dispositivo.
@@ -51,7 +51,7 @@ Arquitectura documentada en `docs/architecture.md`: Android nativo/Kotlin + Shar
 
 ### Checkpoint 2 — bootstrap Android
 
-Estado: **implementado en PR #2; pendiente de CI**.
+Estado: **implementado en PR #2; bloqueado en validación CI antes de iniciar steps**.
 
 Incluye:
 
@@ -63,9 +63,13 @@ Incluye:
 
 No incluye TDLib, login, destinos dinámicos, resolución `t.me/+...` ni envío Telegram. La actividad receptora muestra explícitamente que el transporte aún no está integrado.
 
+### Evidencia CI actual
+
+Run `35061184858` (PR #2) finalizó en aproximadamente dos segundos. Su único job `104681649052` no recibió runner (`runner_id: 0`, nombre vacío) y reporta cero steps ejecutados. Los logs del job no están disponibles. Por ello, el fallo ocurre antes del checkout/build y **no debe corregirse modificando Gradle o código sin nueva evidencia**.
+
 ## KNOWN ISSUES
 
-- PR #2 aún no tiene un resultado CI verificado; no existe APK declarada válida todavía.
+- **CI runner no inicia (prioridad alta para Checkpoint 2):** run `35061184858`, job `104681649052`; `steps: []`, `runner_id: 0`. Causa exacta externa al workflow todavía desconocida (posible disponibilidad/configuración/límite de Actions, no confirmada). Impacto: no se puede declarar el bootstrap compilable ni producir APK verificable. Acción: revalidar un run posterior; si repite sin runner, revisar estado/configuración de GitHub Actions sin alterar código a ciegas.
 - La publicación dinámica de Sharing Shortcuts todavía no está implementada; solo existe la declaración de share-target necesaria para el bootstrap.
 - Integración exacta de TDLib/ABI/tamaño todavía no fue probada en Gradle.
 - El comportamiento de Sharing Shortcuts debe validarse en REDMAGIC; Android decide ranking/posición.
@@ -84,4 +88,4 @@ Leer antes de modificar cualquier cosa y antes de usar el encabezado oficial:
 
 ## Siguiente paso real
 
-Leer el primer GitHub Actions run del PR #2. Si falla, identificar y corregir únicamente la causa real. Si queda verde, registrar el APK debug como artefacto verificable y cerrar Checkpoint 2 antes de implementar publicación dinámica/persistencia de destinos. TDLib sigue fuera de alcance hasta tener el bootstrap verde.
+Revalidar CI del PR #2. No modificar Gradle/código basándose en el failure actual porque el job no ejecutó ningún step. Si un run posterior obtiene runner y falla dentro de un step, leer ese error y corregir únicamente su causa. Si queda verde, registrar el APK debug como artefacto verificable y cerrar Checkpoint 2 antes de implementar publicación dinámica/persistencia de destinos. TDLib sigue fuera de alcance hasta tener el bootstrap verde.
